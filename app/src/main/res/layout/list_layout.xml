@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <android.support.v7.widget.CardView
+        app:cardCornerRadius="25dp"
+        app:cardBackgroundColor="@color/cardview_dark_background"
+        android:layout_margin="5dp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <LinearLayout
+            android:padding="10dp"
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            >
+
+            <ImageView
+                android:layout_marginLeft="10dp"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:adjustViewBounds="true"
+                android:src="@drawable/btc" />
+
+            <TextView
+                android:textAppearance="@style/Base.TextAppearance.AppCompat.Large"
+                android:text="BTC -11.07"
+                android:id="@+id/textViewValue"
+                android:layout_width="300dp"
+                android:layout_height="100dp"
+                android:textColor="@android:color/white"
+                android:gravity="center" />
+
+
+        </LinearLayout>
+
+    </android.support.v7.widget.CardView>
+
+</LinearLayout>
