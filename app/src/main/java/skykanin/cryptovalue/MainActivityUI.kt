@@ -41,32 +41,6 @@ class MainActivityUI : AnkoComponent<MainActivity> {
                 }.lparams(width = matchParent, height = dip(100)) {
                     gravity = Gravity.START
                 }
-
-                linearLayout {
-                    imageView(R.drawable.btc).lparams(dip(75), dip(75)) {
-                        rightMargin = dip(20)
-                    }
-
-                    textView {
-                        text = "BTC"
-                        textSize = 24f
-                        textColor = Color.BLACK
-                    }.lparams {
-                        gravity = Gravity.CENTER_VERTICAL
-                    }
-
-                    textView {
-                        text = "$ 7320"
-                        textSize = 24f
-                    }.lparams {
-                        gravity = Gravity.CENTER_VERTICAL
-                        leftMargin = dip(100)
-                    }
-
-                    background = ResourcesCompat.getDrawable(resources, R.drawable.border_new, null)
-                }.lparams(width = matchParent, height = dip(100)) {
-                    gravity = Gravity.START
-                }
             }.lparams(width= matchParent, height = matchParent)
         }
     }
