@@ -1,5 +1,7 @@
 package skykanin.cryptovalue
 
+import com.google.gson.annotations.SerializedName
+
 enum class CryptoCurrencies(val ticker: String, val img: Int) {
     Bitcoin("BTC", R.drawable.btc),
     Ethereum("ETH", R.drawable.eth),
@@ -49,7 +51,7 @@ data class CurrencyData(val price: Double,
                         val percent_change_1h: Double,
                         val percent_change_24h: Double,
                         val percent_change_7d: Double)
-data class Quotes(val currency: CurrencyData)
+data class Quotes(@SerializedName("USD") val currency: CurrencyData)
 data class TickerInnerData(val id: Int,
                            val name: String,
                            val symbol: String,
