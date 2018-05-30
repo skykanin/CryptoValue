@@ -1,3 +1,4 @@
 <resources>
-    <string name="app_name">CryptoValue</string>
+    <string name="app_name">Crypto Value</string>
+    <string name="dollar">$ </string>
 </resources>
