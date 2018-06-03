@@ -7,7 +7,19 @@ import android.view.View
 import android.view.ViewGroup
 import kotlinx.android.synthetic.main.crypto_row.view.*
 
-class MainAdapter(private val tickerDataList: ArrayList<TickerData?>) : RecyclerView.Adapter<CustomViewHolder>() {
+class MainAdapter : RecyclerView.Adapter<CustomViewHolder>() {
+
+    private val tickerDataList = arrayListOf<TickerData?>()
+
+    fun addTickerData(data: TickerData?) {
+        this.tickerDataList.add(data)
+        notifyDataSetChanged()
+    }
+
+    fun addTickerDataList(data: List<TickerData>) {
+        this.tickerDataList.addAll(data)
+        notifyDataSetChanged()
+    }
 
     override fun getItemCount(): Int {
         return tickerDataList.size
@@ -24,8 +36,8 @@ class MainAdapter(private val tickerDataList: ArrayList<TickerData?>) : Recycler
         holder.view.ticker.text = crypto.ticker
         holder.view.imageView.setImageResource(crypto.img)
         holder.view.setBackgroundColor(Color.WHITE)
-        val price = tickerDataList[position]?.data?.quotes?.currency?.price.toString()
-        holder.view.price.text = "$ $price"
+        val priceData = tickerDataList[position]?.data?.quotes?.currency?.price.toString()
+        holder.view.price.text = "$ $priceData"
     }
 }
 

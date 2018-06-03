@@ -3,71 +3,72 @@ package skykanin.cryptovalue
 import android.app.Activity
 import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
+import android.widget.Toast
+import io.reactivex.Observable
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.coroutines.experimental.android.UI
-import kotlinx.coroutines.experimental.launch
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
-import java.io.IOException
+import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory
 
 class MainActivity : Activity() {
+
+    private lateinit var mainAdapter : MainAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         recyclerView_main.layoutManager = LinearLayoutManager(this)
-        launch(UI) {
-            // apiCall()
-            getTickerData()
-        }
+        mainAdapter = MainAdapter()
+        recyclerView_main.adapter = mainAdapter
+        apiStreamCall()
     }
 
-    private fun apiCall() {
+    private fun apiStreamCall() {
         val builder = Retrofit.Builder()
                 .baseUrl("https://api.coinmarketcap.com/v2/")
                 .addConverterFactory(GsonConverterFactory.create())
+                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .build()
 
         val client = builder.create(CoinMarketApi::class.java)
-        val call = client.getListings()
-        val response = call.execute()
-        when {
-            response.isSuccessful -> { println(response.body()) }
-            !response.isSuccessful -> throw IOException("Unexpected code $response")
-        }
+        client.getListings()
+                .subscribeOn(Schedulers.io())
+                .unsubscribeOn(Schedulers.computation())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({
+                    getTickerData(
+                            it.data
+                            .filter { it.symbol in CryptoCurrencies.values().map { it.ticker } }
+                            .map { it.id.toString() }
+                    )})
     }
 
-    private fun getTickerData() {
+    private fun getTickerData(ids: List<String>?) {
         val builder = Retrofit.Builder()
                 .baseUrl("https://api.coinmarketcap.com/v2/")
                 .addConverterFactory(GsonConverterFactory.create())
+                .addCallAdapterFactory(RxJava2CallAdapterFactory.create())
                 .build()
 
-        val client = builder.create(CoinMarketApi::class.java)
-        val call = client.getTicker("1")
-        /*val response = call.execute()
-        when {
-            response.isSuccessful -> {
-                val list = arrayListOf(response.body())
-                recyclerView_main.adapter = MainAdapter(list)
-            }
-            !response.isSuccessful -> throw IOException("Unexpected code $response")
-        }*/
-        call.enqueue(object : Callback<TickerData> {
-            override fun onResponse(call: Call<TickerData>?, response: Response<TickerData>?) {
-                println(response?.body())
-                val list = arrayListOf(response?.body())
-                recyclerView_main.adapter = MainAdapter(list)
-            }
+        val observables: List<Observable<TickerData>>? = ids?.map { builder
+                .create(CoinMarketApi::class.java)
+                .getTicker(it)
+                .subscribeOn(Schedulers.io())
+                .unsubscribeOn(Schedulers.computation())
+                .observeOn(AndroidSchedulers.mainThread())}
 
-            override fun onFailure(call: Call<TickerData>?, t: Throwable?) {
-                val list = arrayListOf<TickerData?>()
-                recyclerView_main.adapter = MainAdapter(list)
-                println("Error http request failed")
+        val combined = Observable.zip(observables, object : (Array<Any>) -> List<TickerData> {
+            override fun invoke(p1: Array<Any>): List<TickerData> {
+                return p1.toList().filterIsInstance<TickerData>()
             }
         })
+
+        combined.subscribe(
+                        { mainAdapter.addTickerDataList(it) },
+                        { Toast.makeText(applicationContext,
+                                it.message,
+                                Toast.LENGTH_SHORT).show() })
     }
 }
