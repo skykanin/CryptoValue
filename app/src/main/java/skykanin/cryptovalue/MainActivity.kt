@@ -59,16 +59,22 @@ class MainActivity : Activity() {
                 .unsubscribeOn(Schedulers.computation())
                 .observeOn(AndroidSchedulers.mainThread())}
 
-        val combined = Observable.zip(observables, object : (Array<Any>) -> List<TickerData> {
+        val combined = Observable.merge(observables)
+
+        /*val combined = Observable.zip(observables, object : (Array<Any>) -> List<TickerData> {
             override fun invoke(p1: Array<Any>): List<TickerData> {
                 return p1.toList().filterIsInstance<TickerData>()
             }
         })
-
         combined.subscribe(
                         { mainAdapter.addTickerDataList(it) },
                         { Toast.makeText(applicationContext,
                                 it.message,
-                                Toast.LENGTH_SHORT).show() })
+                                Toast.LENGTH_SHORT).show() })*/
+
+        combined.subscribe({ mainAdapter.addTickerData(it) },
+                { Toast.makeText(applicationContext,
+                        it.message,
+                        Toast.LENGTH_SHORT).show() })
     }
 }
